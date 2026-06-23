@@ -1,0 +1,27 @@
+<div class="eg-toolbar">
+    @if (LeftContent != null)
+    {
+        <div class="eg-toolbar__left">
+            @LeftContent
+        </div>
+    }
+
+    @if (RightContent != null)
+    {
+        <div class="eg-toolbar__actions">
+            @RightContent
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// Slot sinistro — informazioni contestuali (stato, titolo, breadcrumb…)
+    /// </summary>
+    [Parameter] public RenderFragment? LeftContent { get; set; }
+
+    /// <summary>
+    /// Slot destro — bottoni di azione della pagina
+    /// </summary>
+    [Parameter] public RenderFragment? RightContent { get; set; }
+}

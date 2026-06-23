@@ -1,0 +1,108 @@
+﻿@* @page "/"
+@page "/home"
+
+
+<PageTitle>EufoGest</PageTitle>
+
+<div class="eg-header">
+    <h1>EufoGest</h1>
+    <span class="eg-subtitle">Gestionale</span>
+</div>
+
+<div class="eg-grid">
+
+    <div class="eg-card">
+        <h2 class="eg-card-title">Anagrafiche</h2>
+        <a href="/anagrafiche/clienti" class="eg-btn">Visualizza clienti</a>
+        <a href="/anagrafiche/clienti/nuovo" class="eg-btn">Nuovo cliente</a>
+        <a href="/anagrafiche/professori" class="eg-btn">Visualizza professori</a>
+        <a href="/anagrafiche/professori/nuovo" class="eg-btn">Nuovo professore</a>
+    </div>
+
+    <div class="eg-card eg-card-disabled">
+        <h2 class="eg-card-title">Lezioni</h2>
+        <p class="eg-wip">In sviluppo</p>
+    </div>
+
+    <div class="eg-card eg-card-disabled">
+        <h2 class="eg-card-title">Pacchetti ore</h2>
+        <p class="eg-wip">In sviluppo</p>
+    </div>
+
+    <div class="eg-card eg-card-disabled">
+        <h2 class="eg-card-title">Compiti</h2>
+        <p class="eg-wip">In sviluppo</p>
+    </div>
+
+</div> *@
+
+@page "/"
+@page "/home"
+@inject AuthService Auth
+@inject HttpClient Http
+@inject NavigationManager Nav
+@using EufoGestWebApp.Services
+
+<PageTitle>EufoGest - Home</PageTitle>
+
+<div class="eg-header">
+    <h1>Benvenuto, @Auth.Username</h1>
+    <span class="eg-subtitle">Ruolo: @Auth.Ruolo</span>
+    <button class="eg-btn eg-btn-danger" @onclick="EseguiLogout">Logout</button>
+</div>
+
+<div class="eg-grid">
+    @* --- SEZIONE ANAGRAFICHE: Visibile solo agli admin --- *@
+    @if (Auth.IsAmministratore)
+    {
+        <div class="eg-card">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <i class="fa-solid fa-address-book" style="font-size: 2rem; color: #deff9a;"></i>
+                <h2 class="eg-card-title" style="margin: 0;">Anagrafiche</h2>
+            </div>
+            <p>Gestione centralizzata di Studenti e Docenti. Crea, modifica o ricerca anagrafiche e dati correlati.</p>
+            <a href="/anagrafiche/clienti" class="eg-btn">Dati Clienti</a>
+            <a href="/anagrafiche/professori" class="eg-btn">Dati Professori</a>
+        </div>
+    }
+
+    @* --- SEZIONE AMMINISTRAZIONE: Visibile solo agli admin --- *@
+    @* @if (Auth.IsAmministratore)
+    {
+        <div class="eg-card">
+            <h2 class="eg-card-title">Gestione Sistema</h2>
+            <p>Configurazione utenti e permessi del personale.</p>
+            <a href="/impostazioni/utenti" class="eg-btn">Gestisci Utenti</a>
+            <a href="/impostazioni/scuola" class="eg-btn">Dati Scuola</a>
+        </div>
+    } *@
+
+    @* --- SEZIONE LEZIONI: Visibile ad operatori e amministratori --- *@
+    @if (Auth.IsAmministratore || Auth.IsOperatore)
+    {
+        <div class="eg-card">
+            <h2 class="eg-card-title">Lezioni</h2>
+            @* <a href="/pacchettiore" class="eg-btn">Pacchetti Ore</a>
+            <a href="/lezioni/gestisci" class="eg-btn">Gestisci Lezioni</a> *@
+            <a href="/lezioni/calendario" class="eg-btn">Calendario</a>
+        </div>
+    }
+
+</div>
+
+@code {
+    private async Task EseguiLogout()
+    {
+        try
+        {
+            // L'api logout invalida il refresh token nei cookie
+            await Http.PostAsync("api/Auth/logout", null);
+        }
+        catch { }
+
+        // Pulisco il SessionStorage, resetto HttpClient e revoco il refresh token
+        await Auth.LogoutAsync();
+
+        Nav.NavigateTo("/login", true);
+    }
+}

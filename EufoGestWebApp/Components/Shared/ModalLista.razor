@@ -1,0 +1,323 @@
+﻿@typeparam TItem
+
+@if (IsVisible)
+{
+    <div class="eg-modal-backdrop" @onclick="HandleBackdropClick">
+
+        <div class="eg-modal-panel eg-card" @onclick:stopPropagation="true">
+
+            <h2 class="eg-card-title" style="font-size: 13px; margin-bottom: 1rem;">
+                @Title
+            </h2>
+
+            @if (ShowSearch)
+            {
+                <div class="eg-field" style="margin-bottom: 12px;">
+                    <input type="search"
+                           class="eg-input"
+                           placeholder="@SearchPlaceholder"
+                           @bind="_filtro"
+                           @bind:event="oninput"
+                           @bind:after="ResetPagina" />
+                </div>
+            }
+
+            @{
+                var filtrati = ItemiFiltrati().ToList();
+                var totalePagine = PageSize > 0 ? (int)Math.Ceiling((double)filtrati.Count / PageSize) : 1;
+                if (totalePagine < 1) totalePagine = 1;
+                if (_paginaCorrente > totalePagine) _paginaCorrente = totalePagine;
+                var itemsVisibili = filtrati
+                    .Skip((_paginaCorrente - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList();
+            }
+            <div class="eg-modal-table-wrap">
+                <table class="eg-modal-table">
+                    <thead>
+                        <tr>
+                            @HeaderTemplate
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (itemsVisibili.Any())
+                        {
+                            @foreach (var item in itemsVisibili)
+                            {
+                                var isSelezionata = EqualityComparer<TItem>.Default.Equals(item, _rigaSelezionata);
+                                <tr class="eg-modal-row @(isSelezionata ? "eg-modal-row--selected" : "")"
+                                    @ondblclick="() => SelezionaItem(item)"
+                                    @onclick="() => SelezionaRiga(item)">
+                                    @ItemTemplate(item)
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td  class="eg-hint" style="text-align: center; padding: 2rem;">
+                                    Nessun elemento trovato.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="eg-modal-pagination">
+                <div class="eg-modal-pagination__nav">
+                    <button type="button" class="eg-btn-ghost eg-modal-pagination__btn"
+                            disabled="@(_paginaCorrente <= 1)"
+                            @onclick="() => VaiAPagina(1)"
+                            title="Prima pagina">
+                        «
+                    </button>
+                    <button type="button" class="eg-btn-ghost eg-modal-pagination__btn"
+                            disabled="@(_paginaCorrente <= 1)"
+                            @onclick="() => VaiAPagina(_paginaCorrente - 1)"
+                            title="Pagina precedente">
+                        ‹
+                    </button>
+
+                    @{
+                        int finestra = 2; // pagine a sx e dx della corrente
+                        int pStart = Math.Max(1, _paginaCorrente - finestra);
+                        int pEnd = Math.Min(totalePagine, _paginaCorrente + finestra);
+                        if (pEnd - pStart < finestra * 2)
+                        {
+                            pStart = Math.Max(1, pEnd - finestra * 2);
+                            pEnd = Math.Min(totalePagine, pStart + finestra * 2);
+                        }
+                    }
+                    @if (pStart > 1)
+                    {
+                        <span class="eg-modal-pagination__ellipsis">…</span>
+                    }
+                    @for (int p = pStart; p <= pEnd; p++)
+                    {
+                        var pagina = p; 
+                        <button type="button"
+                                class="eg-btn-ghost eg-modal-pagination__btn @(_paginaCorrente == pagina ? "eg-modal-pagination__btn--active" : "")"
+                                @onclick="() => VaiAPagina(pagina)">
+                            @pagina
+                        </button>
+                    }
+                    @if (pEnd < totalePagine)
+                    {
+                        <span class="eg-modal-pagination__ellipsis">…</span>
+                    }
+
+                    <button type="button" class="eg-btn-ghost eg-modal-pagination__btn"
+                            disabled="@(_paginaCorrente >= totalePagine)"
+                            @onclick="() => VaiAPagina(_paginaCorrente + 1)"
+                            title="Pagina successiva">
+                        ›
+                    </button>
+                    <button type="button" class="eg-btn-ghost eg-modal-pagination__btn"
+                            disabled="@(_paginaCorrente >= totalePagine)"
+                            @onclick="() => VaiAPagina(totalePagine)"
+                            title="Ultima pagina">
+                        »
+                    </button>
+                </div>
+
+                <span class="eg-hint" style="white-space: nowrap;">
+                    @{
+                        var primoEl = filtrati.Count == 0 ? 0 : (_paginaCorrente - 1) * PageSize + 1;
+                        var ultiEl = Math.Min(_paginaCorrente * PageSize, filtrati.Count);
+                    }
+                    @primoEl–@ultiEl di @filtrati.Count
+                    @if (ShowSearch && !string.IsNullOrWhiteSpace(_filtro))
+                    {
+                        <span>&nbsp;(filtrati su @(Items?.Count() ?? 0))</span>
+                    }
+                </span>
+
+                <button type="button" class="eg-btn-ghost" @onclick="Nascondi">Chiudi</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .eg-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.38);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .eg-modal-panel {
+        width: 90%;
+        max-width: 720px;
+        max-height: 82vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .eg-modal-table-wrap {
+        overflow-y: auto;
+        flex-grow: 1;
+        border: 1px solid var(--eg-disabled-border);
+        border-radius: var(--eg-border-radius-btn);
+    }
+
+    .eg-modal-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 13px;
+    }
+
+        .eg-modal-table thead {
+            background: var(--eg-primary-wash);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+            .eg-modal-table thead th {
+                padding: 8px 10px;
+                font-size: 11px;
+                font-weight: 500;
+                color: var(--eg-primary-mid);
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+            }
+
+    .eg-modal-row {
+        cursor: pointer;
+        border-bottom: 1px solid var(--eg-primary-wash);
+        transition: background 0.1s;
+    }
+
+        .eg-modal-row:hover {
+            background: var(--eg-primary-wash);
+        }
+
+        .eg-modal-row.eg-modal-row--selected {
+            background: var(--eg-primary-pale);
+        }
+
+        .eg-modal-row td {
+            padding: 7px 10px;
+        }
+
+
+
+    .eg-modal-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 0.85rem;
+        flex-wrap: wrap;
+    }
+
+    .eg-modal-pagination__nav {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .eg-modal-pagination__btn {
+        padding: 5px 10px !important;
+        min-width: 32px;
+        text-align: center;
+        font-size: 13px !important;
+    }
+
+    .eg-modal-pagination__btn--active {
+        background: var(--eg-primary-mid) !important;
+        border-color: var(--eg-primary-mid) !important;
+        color: #fff !important;
+        font-weight: 600;
+    }
+
+    .eg-modal-pagination__ellipsis {
+        padding: 0 4px;
+        color: var(--eg-text-muted);
+        font-size: 13px;
+        line-height: 1;
+        align-self: flex-end;
+    }
+</style>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Seleziona elemento";
+    [Parameter] public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+
+    [Parameter] public bool ShowSearch { get; set; } = true;
+    [Parameter] public string SearchPlaceholder { get; set; } = "Cerca...";
+    [Parameter] public int PageSize { get; set; } = 10;
+
+    /// <summary>
+    /// Funzione di filtro personalizzabile dal genitore.
+    /// Riceve l'item e il testo digitato; restituisce true se l'item va mostrato.
+    /// Se non valorizzata, mostra tutti gli elementi.
+    /// </summary>
+    [Parameter] public Func<TItem, string, bool>? FilterFunc { get; set; }
+
+    // Chiude il modale cliccando sul backdrop - default: true
+    [Parameter] public bool CloseOnBackdrop { get; set; } = true;
+
+    [Parameter] public RenderFragment HeaderTemplate { get; set; } = default!;
+    [Parameter] public RenderFragment<TItem> ItemTemplate { get; set; } = default!;
+
+    // Scatta quando l'utente fa doppio click su una riga
+    [Parameter] public EventCallback<TItem> OnItemSelected { get; set; }
+
+    public bool IsVisible { get; private set; }
+
+    private string _filtro = "";
+    private int _paginaCorrente = 1;
+    private TItem? _rigaSelezionata;
+
+    public void Mostra()
+    {
+        _filtro = "";
+        _paginaCorrente = 1;
+        _rigaSelezionata = default;
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void Nascondi()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+
+    private IEnumerable<TItem> ItemiFiltrati()
+    {
+        if (!ShowSearch || string.IsNullOrWhiteSpace(_filtro) || FilterFunc is null)
+            return Items ?? Array.Empty<TItem>();
+
+        return Items.Where(i => FilterFunc(i, _filtro));
+    }
+
+    private void ResetPagina() => _paginaCorrente = 1;
+
+    private void VaiAPagina(int pagina) => _paginaCorrente = pagina;
+
+    private void SelezionaRiga(TItem item)
+    {
+        _rigaSelezionata = item;
+    }
+
+    private async Task SelezionaItem(TItem item)
+    {
+        await OnItemSelected.InvokeAsync(item);
+        Nascondi();
+    }
+
+    private void HandleBackdropClick()
+    {
+        if (CloseOnBackdrop) Nascondi();
+    }
+}

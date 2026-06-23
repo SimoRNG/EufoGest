@@ -1,0 +1,79 @@
+@using EufoGestWebApp.Services
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+@if (!_inizializzazioneCompletata)
+{
+    @* Evita la schermata bianca mentre si aspetta la lettura del SessionStorage *@
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <span>Caricamento...</span>
+    </div>
+}
+else if (_autorizzato)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _autorizzato = false;
+    private bool _inizializzazioneCompletata = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Recupera il token (eseguito UNA sola volta all'avvio)
+        await Auth.InitAsync();
+        _inizializzazioneCompletata = true;
+
+        // Fai il primo controllo della rotta
+        ControllaAccesso();
+    }
+
+    protected override void OnParametersSet()
+    {
+        // OnParametersSet viene scatenato dal Router AD OGNI CAMBIO URL
+        // Se l'inizializzazione del token è finita, ricalcoliamo le autorizzazioni
+        if (_inizializzazioneCompletata)
+        {
+            ControllaAccesso();
+        }
+    }
+
+    private void ControllaAccesso()
+    {
+        if (!Auth.IsAutenticato)
+        {
+            // L'utente NON è loggato
+            if (!Nav.Uri.Contains("/login", StringComparison.OrdinalIgnoreCase))
+            {
+                _autorizzato = false;
+                Nav.NavigateTo("/login");
+            }
+            else
+            {
+                // È già sulla pagina di login, lo facciamo passare
+                _autorizzato = true;
+            }
+        }
+        else
+        {
+            // L'utente È loggato
+            if (Nav.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase) ||
+                Nav.Uri.Equals(Nav.BaseUri, StringComparison.OrdinalIgnoreCase))
+            {
+                // Se prova a tornare al login o va sulla root "/", lo forzo alla home
+                _autorizzato = false;
+                Nav.NavigateTo("/home");
+            }
+            else
+            {
+                // Altrimenti lo lascio navigare liberamente
+                _autorizzato = true;
+            }
+        }
+
+        // Forza l'aggiornamento dell'interfaccia con il nuovo stato
+        StateHasChanged();
+    }
+}

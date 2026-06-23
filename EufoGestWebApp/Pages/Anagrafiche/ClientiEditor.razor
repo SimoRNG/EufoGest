@@ -1,0 +1,208 @@
+﻿@page "/anagrafiche/clienti"
+@using EufoGestShared.DTO
+@using EufoGestShared.Enums
+@using EufoGestWebApp.Components.Shared
+
+<PageTitle>Gestione Anagrafiche — EufoGest</PageTitle>
+
+<div class="eg-header">
+    <h1>EufoGest</h1>
+    <span class="eg-subtitle">Manager Anagrafiche Clienti</span>
+</div>
+
+<EufoGestWebApp.Components.Shared.PageToolbar>
+    <LeftContent>
+        <div class="eg-toolbar__left">
+            <span class="eg-subtitle" style="margin: 0;">
+                Stato: <strong>@StatoInput.ToString().Replace("SP_", "")</strong>
+            </span>
+        </div>
+    </LeftContent>
+
+    <RightContent>
+        <div class="eg-toolbar__actions">
+            <button type="button" class="eg-btn-primary" disabled="@isEditing" @onclick='() => tblbtnClick("btnNuovo")'>
+                <i class="fa-solid fa-plus"></i> Nuovo
+            </button>
+            <button type="button" class="eg-btn-primary" disabled="@(isEditing)" @onclick='() => tblbtnClick("btnModifica")'>
+                <i class="fa-solid fa-pen"></i> Modifica
+            </button>
+            <button type="button" class="eg-btn-danger" disabled="@(isEditing)" @onclick='() => tblbtnClick("btnElimina")'>
+                <i class="fa-solid fa-trash"></i> Elimina
+            </button>
+
+            <button type="button" class="eg-btn-primary" disabled="@(!isEditing)" @onclick='() => tblbtnClick("btnSalva")'>
+                <i class="fa-solid fa-floppy-disk"></i> Salva
+            </button>
+            <button type="button" class="eg-btn-ghost" disabled="@(!isEditing)" @onclick='() => tblbtnClick("btnAnnulla")'>
+                <i class="fa-solid fa-xmark"></i> Annulla
+            </button>
+        </div>
+    </RightContent>
+</EufoGestWebApp.Components.Shared.PageToolbar>
+
+<div class="eg-toolbar" style="margin-top: -0.5rem; margin-bottom: 1.25rem;">
+    <div class="eg-toolbar__left" style="width: 100%; max-width: 550px;">
+        <div class="eg-field" style="margin-bottom: 0; flex-direction: row; align-items: center; gap: 12px; width: 100%;">
+            <label class="eg-label" style="white-space: nowrap; min-width: 70px;">ID Cliente:</label>
+            <input type="text" class="eg-input" style="max-width: 140px;"
+                   placeholder="Es. 104"
+                   @bind="ContestoPagina.ID"
+                   id="txtId"
+                   disabled="@(StatoInput != StatoMacchina.SP_INIZIO
+                                                              && StatoInput != StatoMacchina.SP_VISUALIZZA
+                                                              && StatoInput != StatoMacchina.SP_ELIMINA)"
+                   @onkeydown="TxtIdKeyDown" />
+            
+            <button type="button" class="eg-btn-ghost" style="padding: 8px 14px; display: flex; align-items: center; gap: 6px;"
+                    @onclick="ApriListaClienti"
+                    disabled="@(StatoInput != StatoMacchina.SP_INIZIO
+                                                                 && StatoInput != StatoMacchina.SP_VISUALIZZA
+                                                                 && StatoInput != StatoMacchina.SP_ELIMINA)">
+                <i class="fa-solid fa-list-ul"></i> Sfoglia Lista
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="eg-form-layout">
+    
+    <div class="eg-card">
+        <h2 class="eg-card-title">Dati Anagrafici</h2>
+        
+        <div class="eg-field-row">
+            <div class="eg-field">
+                <label class="eg-label">Nome</label>
+                <input type="text" class="eg-input"
+                       disabled="@(!isEditing)"
+                       @bind="ContestoPagina.Nome"
+                       placeholder="Inserisci il nome" />
+            </div>
+            <div class="eg-field">
+                <label class="eg-label">Cognome</label>
+                <input type="text" class="eg-input"
+                       disabled="@(!isEditing)"
+                       @bind="ContestoPagina.Cognome"
+                       placeholder="Inserisci il cognome" />
+            </div>
+        </div>
+
+        <div class="eg-field">
+            <label class="eg-label">Data di Nascita</label>
+            <input type="date" class="eg-input"
+                   disabled="@(!isEditing)"
+                   @bind="ContestoPagina.DataNascita" />
+        </div>
+    </div>
+
+    <div class="eg-card">
+        <h2 class="eg-card-title">Recapiti</h2>
+        
+        <div class="eg-field">
+            <label class="eg-label">Email</label>
+            <input type="email" class="eg-input"
+                   disabled="@(!isEditing)"
+                   @bind="ContestoPagina.Email"
+                   placeholder="es. nome@dominio.com" />
+        </div>
+
+        <div class="eg-field">
+            <label class="eg-label">Telefono</label>
+            <input type="tel" class="eg-input"
+                   disabled="@(!isEditing)"
+                   @bind="ContestoPagina.Telefono"
+                   placeholder="es. +39 333 1234567" />
+        </div>
+    </div>
+
+    <div class="eg-card">
+        <h2 class="eg-card-title">Stato Cliente</h2>
+        
+        <div class="eg-field-row">
+            <div class="eg-field">
+                <label class="eg-label">Data Iscrizione</label>
+                <input type="date" class="eg-input"
+                       disabled="@(!isEditing)"
+                       @bind="ContestoPagina.DataIscrizione" />
+            </div>
+            <div class="eg-field">
+                <label class="eg-label">Stato Attività</label>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                    <input type="checkbox" class="eg-checkbox"
+                           disabled="@(!isEditing)"
+                           @bind="ContestoPagina.Attiva"
+                           id="chkAttiva" />
+                    <label for="chkAttiva" class="eg-hint" style="margin: 0; color: var(--eg-text-main);">
+                        Anagrafica attiva
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="eg-card eg-card-full">
+        <h2 class="eg-card-title">Lingue Studiate</h2>
+        
+        <div class="eg-lingue-grid">
+            @if (_lingueDisponibili != null && _lingueDisponibili.Any())
+            {
+                @foreach (var lingua in _lingueDisponibili)
+                {
+                    // Determina se la lingua è attualmente selezionata nell'HashSet
+                    bool isSelezionata = ContestoPagina.LingueStudiate.Contains(lingua.Codice);
+                    string classePill = isSelezionata ? "eg-lingua-pill eg-lingua-pill--on" : "eg-lingua-pill";
+
+                    <div class="@classePill"
+                         @onclick="() => ToggleLingua(ContestoPagina.LingueStudiate, lingua.Codice, isEditing)">
+                        @lingua.Descrizione
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="eg-wip">Nessuna lingua disponibile nel sistema.</p>
+            }
+        </div>
+        <p class="eg-hint">Clicca sulle lingue per aggiungerle o rimuoverle (solo in modalità modifica).</p>
+    </div>
+
+</div>
+
+
+@* MODAL LISTA *@
+<ModalLista TItem="ClienteDTO"
+            @ref="_modalClienti"
+            Title="Lista Clienti"
+            Items="@_listaClienti"
+            ShowSearch="true"
+            SearchPlaceholder="Cerca per nome, cognome, email..."
+            PageSize="@_elementiPerPagina"
+            FilterFunc="FiltroCliente"
+            OnItemSelected="OnClienteSelezionato">
+
+    <HeaderTemplate>
+        <th>ID</th>
+        <th>Cognome</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Telefono</th>
+        <th>Attivo</th>
+    </HeaderTemplate>
+
+    <ItemTemplate Context="cliente">
+        <td>@cliente.ID</td>
+        <td>@cliente.Cognome</td>
+        <td>@cliente.Nome</td>
+        <td>@cliente.Email</td>
+        <td>@cliente.Telefono</td>
+        @if (cliente.Attiva)
+        {
+            <td>SI</td>
+        }
+        else
+        {
+            <td>NO</td>
+        }
+    </ItemTemplate>
+
+</ModalLista>

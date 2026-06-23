@@ -1,0 +1,15 @@
+﻿@using EufoGestWebApp.Components
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteGuard> @* <--- Protegge tutto ciò che viene trovato *@
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </RouteGuard>
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(Layout.MainLayout)">
+            <p role="alert">Pagina non trovata.</p>
+        </LayoutView>
+    </NotFound>
+</Router>

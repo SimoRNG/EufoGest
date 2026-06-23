@@ -1,0 +1,34 @@
+@using EufoGestWeb.Client.Services
+@* Se l'utente non è autenticato,
+   redirige a /login invece di mostrare il contenuto. *@
+
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+@if (_controllato)
+{
+    @ChildContent
+}
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool _controllato = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Auth.InitAsync();
+
+        if (!Auth.IsAutenticato)
+        {
+            // Salva la pagina richiesta per reindirizzarci dopo il login (opzionale)
+            var paginaCorrente = Nav.Uri;
+            Nav.NavigateTo($"/login", replace: true);
+            return;
+        }
+
+        _controllato = true;
+    }
+}

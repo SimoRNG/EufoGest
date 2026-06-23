@@ -1,0 +1,43 @@
+@namespace EufoGestWeb.Client
+@using EufoGestWeb.Client.Pages.Components
+@* EufoGestWeb/Components/Routes.razor *@
+@* @using EufoGestWeb.Client.Components *@
+<Router AppAssembly="typeof(Program).Assembly"
+        AdditionalAssemblies="new[] { typeof(EufoGestWeb.Client._Imports).Assembly }">
+    <Found Context="routeData">
+        @if (IsPaginaPubblica(routeData))
+        {
+            @* Usa il MainLayout che ora è nel Client *@
+            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        }
+        else
+        {
+            <RouteGuard>
+                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+            </RouteGuard>
+        }
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="typeof(Layout.MainLayout)">
+            <p role="alert">Scusa, non c'è nulla a questo indirizzo.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+@code {
+    private static readonly HashSet<string> PaginePubbliche = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "/login"
+    };
+
+    private static bool IsPaginaPubblica(RouteData routeData)
+    {
+        var template = routeData.PageType
+            .GetCustomAttributes(typeof(Microsoft.AspNetCore.Components.RouteAttribute), false)
+            .Cast<Microsoft.AspNetCore.Components.RouteAttribute>()
+            .FirstOrDefault()?.Template ?? "";
+
+        return PaginePubbliche.Contains(template);
+    }
+}

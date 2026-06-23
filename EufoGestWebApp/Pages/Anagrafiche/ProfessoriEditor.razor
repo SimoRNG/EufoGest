@@ -1,0 +1,172 @@
+﻿@page "/anagrafiche/professori"
+@using EufoGestShared.DTO
+@using EufoGestShared.Enums
+@using EufoGestWebApp.Components.Shared
+
+<PageTitle>Gestione Professori — EufoGest</PageTitle>
+
+<div class="eg-header">
+    <h1>EufoGest</h1>
+    <span class="eg-subtitle">Manager Anagrafiche Professori</span>
+</div>
+
+<EufoGestWebApp.Components.Shared.PageToolbar>
+    <LeftContent>
+        <div class="eg-toolbar__left">
+            <span class="eg-subtitle" style="margin: 0;">
+                Stato: <strong>@StatoInput.ToString().Replace("SP_", "")</strong>
+            </span>
+        </div>
+    </LeftContent>
+
+    <RightContent>
+        <div class="eg-toolbar__actions">
+            <button type="button" class="eg-btn-primary" disabled="@isEditing" @onclick='() => tblbtnClick("btnNuovo")'>
+                <i class="fa-solid fa-plus"></i> Nuovo
+            </button>
+            <button type="button" class="eg-btn-primary" disabled="@(isEditing)" @onclick='() => tblbtnClick("btnModifica")'>
+                <i class="fa-solid fa-pen"></i> Modifica
+            </button>
+            <button type="button" class="eg-btn-danger" disabled="@(isEditing)" @onclick='() => tblbtnClick("btnElimina")'>
+                <i class="fa-solid fa-trash"></i> Elimina
+            </button>
+
+            <button type="button" class="eg-btn-primary" disabled="@(!isEditing)" @onclick='() => tblbtnClick("btnSalva")'>
+                <i class="fa-solid fa-floppy-disk"></i> Salva
+            </button>
+            <button type="button" class="eg-btn-ghost" disabled="@(!isEditing)" @onclick='() => tblbtnClick("btnAnnulla")'>
+                <i class="fa-solid fa-xmark"></i> Annulla
+            </button>
+        </div>
+    </RightContent>
+</EufoGestWebApp.Components.Shared.PageToolbar>
+
+<div class="eg-toolbar" style="margin-top: -0.5rem; margin-bottom: 1.25rem;">
+    <div class="eg-toolbar__left" style="width: 100%; max-width: 550px;">
+        <div class="eg-field" style="margin-bottom: 0; flex-direction: row; align-items: center; gap: 12px; width: 100%;">
+            <label class="eg-label" style="white-space: nowrap; min-width: 70px;">ID Professore:</label>
+            <input type="text" class="eg-input" style="max-width: 140px;"
+                   placeholder="Es. 104"
+                   @bind="ContestoPagina.ID"
+                   id="txtId"
+                   disabled="@(StatoInput != StatoMacchina.SP_INIZIO && StatoInput != StatoMacchina.SP_VISUALIZZA && StatoInput != StatoMacchina.SP_ELIMINA)"
+                   @onkeydown="TxtIdKeyDown" />
+            
+            <button type="button" class="eg-btn-ghost" style="padding: 8px 14px; display: flex; align-items: center; gap: 6px;"
+                    @onclick="ApriListaProfessori"
+                    disabled="@(StatoInput != StatoMacchina.SP_INIZIO && StatoInput != StatoMacchina.SP_VISUALIZZA && StatoInput != StatoMacchina.SP_ELIMINA)">
+                <i class="fa-solid fa-list-ul"></i> Sfoglia Lista
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="eg-form-layout">
+    
+    <div class="eg-card">
+        <h2 class="eg-card-title">Dati Anagrafici</h2>
+        <div class="eg-field-row">
+            <div class="eg-field">
+                <label class="eg-label">Nome</label>
+                <input type="text" class="eg-input" disabled="@(!isEditing)" @bind="ContestoPagina.Nome" />
+            </div>
+            <div class="eg-field">
+                <label class="eg-label">Cognome</label>
+                <input type="text" class="eg-input" disabled="@(!isEditing)" @bind="ContestoPagina.Cognome" />
+            </div>
+        </div>
+        <div class="eg-field">
+            <label class="eg-label">Data di Nascita</label>
+            <input type="date" class="eg-input" disabled="@(!isEditing)" @bind="ContestoPagina.DataNascita" />
+        </div>
+    </div>
+
+    <div class="eg-card">
+        <h2 class="eg-card-title">Recapiti</h2>
+        <div class="eg-field">
+            <label class="eg-label">Email</label>
+            <input type="email" class="eg-input" disabled="@(!isEditing)" @bind="ContestoPagina.Email" />
+        </div>
+        <div class="eg-field">
+            <label class="eg-label">Telefono</label>
+            <input type="tel" class="eg-input" disabled="@(!isEditing)" @bind="ContestoPagina.Telefono" />
+        </div>
+    </div>
+
+    <div class="eg-card">
+        <h2 class="eg-card-title">Dati Contrattuali</h2>
+        <div class="eg-field-row">
+            <div class="eg-field">
+                <label class="eg-label">Paga Oraria (€)</label>
+                <input type="number" step="0.5" class="eg-input" disabled="@(!isEditing)" @bind="ContestoPagina.PagaOraria" />
+            </div>
+            <div class="eg-field">
+                <label class="eg-label">Stato Attività</label>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                    <input type="checkbox" class="eg-checkbox" disabled="@(!isEditing)" @bind="ContestoPagina.Attiva" id="chkAttiva" />
+                    <label for="chkAttiva" class="eg-hint" style="margin: 0;">Professore attivo</label>
+                </div>
+            </div>
+        </div>
+        <div class="eg-field-row" style="margin-top: 15px;">
+            <div class="eg-field">
+                <label class="eg-label">Inizio Contratto</label>
+                <input type="date" class="eg-input" disabled="@(!isEditing)" @bind="ContestoPagina.InizioContratto" />
+            </div>
+            <div class="eg-field">
+                <label class="eg-label">Fine Contratto</label>
+                <input type="date" class="eg-input" disabled="@(!isEditing)" @bind="ContestoPagina.FineContratto" />
+            </div>
+        </div>
+        <div class="eg-field" style="margin-top: 15px;">
+            <label class="eg-label">Note</label>
+            <textarea class="eg-input" rows="3" disabled="@(!isEditing)" @bind="ContestoPagina.Note"></textarea>
+        </div>
+    </div>
+
+    <div class="eg-card eg-card-full">
+        <h2 class="eg-card-title">Lingue Insegnate</h2>
+        <div class="eg-lingue-grid">
+            @if (_lingueDisponibili != null && _lingueDisponibili.Any())
+            {
+                @foreach (var lingua in _lingueDisponibili)
+                {
+                    bool isSelezionata = ContestoPagina.LingueInsegnate.Contains(lingua.Codice);
+                    string classePill = isSelezionata ? "eg-lingua-pill eg-lingua-pill--on" : "eg-lingua-pill";
+
+                    <div class="@classePill"
+                         @onclick="() => ToggleLingua(ContestoPagina.LingueInsegnate, lingua.Codice, isEditing)">
+                        @lingua.Descrizione
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<ModalLista TItem="ProfessoreDTO"
+            @ref="_modalProfessori"
+            Title="Lista Professori"
+            Items="@_listaProfessori"
+            ShowSearch="true"
+            SearchPlaceholder="Cerca per nome, cognome..."
+            PageSize="@_elementiPerPagina"
+            FilterFunc="FiltroProfessore"
+            OnItemSelected="OnProfessoreSelezionato">
+    <HeaderTemplate>
+        <th>ID</th>
+        <th>Cognome</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Telefono</th>
+        <th>Attivo</th>
+    </HeaderTemplate>
+    <ItemTemplate Context="professore">
+        <td>@professore.ID</td>
+        <td>@professore.Cognome</td>
+        <td>@professore.Nome</td>
+        <td>@professore.Email</td>
+        <td>@professore.Telefono</td>
+        <td>@(professore.Attiva ? "SI" : "NO")</td>
+    </ItemTemplate>
+</ModalLista>

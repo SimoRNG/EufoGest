@@ -1,0 +1,273 @@
+@page "/login"
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject AuthService Auth
+@using EufoGestShared.DTO
+@using EufoGestWebApp.Services
+
+<PageTitle>Accesso — EufoGest</PageTitle>
+
+<div class="login-shell">
+
+    <div class="login-card">
+
+        <div class="login-logo-area">
+            <!-- Placeholder logo — sostituire con immagine da tab_Scuola -->
+            <div class="login-logo-placeholder">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="48" height="48" rx="14" fill="#3B6D11"/>
+                    <path d="M10 34 L24 14 L38 34" stroke="#C0DD97" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 34 L24 20 L32 34" stroke="#EAF3DE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="24" cy="11" r="3" fill="#97C459"/>
+                </svg>
+            </div>
+            <span class="login-app-name">EufoGest</span>
+            <span class="login-app-tagline">Gestionale scolastico</span>
+        </div>
+
+        <div class="login-form-area">
+
+            @if (!string.IsNullOrEmpty(_errore))
+            {
+                <div class="login-alert">
+                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    @_errore
+                </div>
+            }
+
+            <div class="eg-field">
+                <label class="eg-label" for="username">Username</label>
+                <input class="eg-input"
+                       id="username"
+                       type="text"
+                       placeholder="Inserisci username"
+                       autocomplete="username"
+                       @bind="_username"
+                       @bind:event="oninput"
+                       @onkeydown="OnKeyDown"
+                       disabled="@_caricamento" />
+            </div>
+
+            <div class="eg-field">
+                <label class="eg-label" for="password">Password</label>
+                <input class="eg-input"
+                       id="password"
+                       type="password"
+                       placeholder="Inserisci password"
+                       autocomplete="current-password"
+                       @bind="_password"
+                       @bind:event="oninput"
+                       @onkeydown="OnKeyDown"
+                       disabled="@_caricamento" />
+            </div>
+
+            <button class="login-btn"
+                    disabled="@(!FormValido || _caricamento)"
+                    @onclick="Accedi">
+                @if (_caricamento)
+                {
+                    <span class="login-spinner"></span>
+                    <span>Accesso in corso...</span>
+                }
+                else
+                {
+                    <span>Accedi</span>
+                }
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    /* ── Shell ──────────────────────────────────────────────────── */
+    .login-shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #F4F9EE;
+        padding: 1rem;
+    }
+
+    /* ── Card ───────────────────────────────────────────────────── */
+    .login-card {
+        background: #fff;
+        border: 1px solid #C0DD97;
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        width: 100%;
+        max-width: 360px;
+        box-shadow: 0 4px 24px rgba(59, 109, 17, 0.08);
+    }
+
+    /* ── Logo area ──────────────────────────────────────────────── */
+    .login-logo-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 2rem;
+    }
+
+    .login-logo-placeholder svg {
+        width: 56px;
+        height: 56px;
+    }
+
+    .login-app-name {
+        font-size: 20px;
+        font-weight: 600;
+        color: #27500A;
+        letter-spacing: -0.01em;
+        margin-top: 4px;
+    }
+
+    .login-app-tagline {
+        font-size: 11px;
+        color: #3B6D11;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    /* ── Form area ──────────────────────────────────────────────── */
+    .login-form-area {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* ── Alert ──────────────────────────────────────────────────── */
+    .login-alert {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: #fff0f0;
+        border: 1px solid #f5a0a0;
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: 12px;
+        color: #8b0000;
+        margin-bottom: 8px;
+    }
+
+    /* ── Bottone login ──────────────────────────────────────────── */
+    .login-btn {
+        width: 100%;
+        margin-top: 10px;
+        background: #3B6D11;
+        border: none;
+        border-radius: 10px;
+        padding: 11px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background 0.15s;
+    }
+
+    .login-btn:hover:not(:disabled) {
+        background: #27500A;
+    }
+
+    .login-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* ── Spinner ────────────────────────────────────────────────── */
+    .login-spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255,255,255,0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+@code {
+
+    private string _username  = "";
+    private string _password  = "";
+    private string _errore    = "";
+    private bool   _caricamento = false;
+
+    private bool FormValido =>
+        !string.IsNullOrWhiteSpace(_username) &&
+        !string.IsNullOrWhiteSpace(_password);
+
+    // Se è già autenticato ritorno alla home
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await Auth.GetTokenAsync();
+        if (!string.IsNullOrEmpty(token))
+            Nav.NavigateTo("/", replace: true);
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && FormValido && !_caricamento)
+            await Accedi();
+    }
+
+    private async Task Accedi()
+    {
+        if (!FormValido || _caricamento) return;
+
+        _caricamento = true;
+        _errore      = "";
+
+        try
+        {
+            var payload = new LoginRequestDTO
+            {
+                Username = _username.Trim(),
+                Password = _password
+            };
+
+            var risposta = await Http.PostAsJsonAsync("api/Auth/login", payload);
+
+            if (risposta.IsSuccessStatusCode)
+            {
+                var body = await risposta.Content.ReadFromJsonAsync<LoginResponseDTO>();
+                if (body != null)
+                {
+                    await Auth.SalvaTokenAsync(body.Token, body.Username, body.Ruolo);
+                    Nav.NavigateTo("/home");
+                }
+            }
+            else if (risposta.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                _errore = "Username o password non corretti.";
+            }
+            else
+            {
+                _errore = $"Errore del server ({(int)risposta.StatusCode}). Riprova più tardi.";
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine("ERRORE: " + ex);
+            _errore = "Impossibile contattare il server. Controlla la connessione.";
+        }
+        finally
+        {
+            _caricamento = false;
+        }
+    }
+}

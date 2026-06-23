@@ -1,0 +1,43 @@
+﻿@namespace EufoGestWebApp.Pages.Lezioni
+
+<div class="blocco-ora blocco-ora--@StatoCss"
+     style="border-left-color:@ColoreHex; background-color:@ColoreHexSfondo; @Stile"
+     draggable="true"
+     @onclick:stopPropagation="true"
+     @ondragstart="HandleDragStart"
+     @ondblclick="HandleDoppioClick"
+     title="@Tooltip">
+
+    <div class="blocco-ora__top">
+        <span class="blocco-ora__orario">@OrarioFormattato</span>
+        <span class="blocco-ora__badge blocco-ora__badge--@StatoCss">@StatoLabel</span>
+    </div>
+
+    <div class="blocco-ora__lingua">@Lezione.Lingua</div>
+
+    @if (NomiProfessori.Count == 1)
+    {
+        <div class="blocco-ora__riga">
+            <span class="blocco-ora__etichetta">Prof.&nbsp;</span>@NomiProfessori[0]
+        </div>
+    }
+    else if (NomiProfessori.Count > 1)
+    {
+        <div class="blocco-ora__riga">
+            <span class="blocco-ora__etichetta">Prof.&nbsp;</span>@NomiProfessori.Count professori
+        </div>
+    }
+
+    @if (NomiStudenti.Count == 1)
+    {
+        <div class="blocco-ora__riga">
+            <span class="blocco-ora__etichetta">Stud.&nbsp;</span>@NomiStudenti[0]
+        </div>
+    }
+    else if (NomiStudenti.Count > 1)
+    {
+        <div class="blocco-ora__riga">
+            <span class="blocco-ora__etichetta">Stud.&nbsp;</span>@NomiStudenti.Count studenti
+        </div>
+    }
+</div>

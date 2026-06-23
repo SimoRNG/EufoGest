@@ -1,0 +1,356 @@
+﻿@page "/Lezioni/Calendario"
+@namespace EufoGestWebApp.Pages.Lezioni
+@using EufoGestShared.DTO
+@using EufoGestShared.Models
+@using EufoGestWebApp.Services
+@using EufoGestWebApp.Components.Shared
+
+<div class="eg-header">
+    <h1>Calendario Lezioni</h1>
+    <span class="eg-subtitle">@TitoloNavigazione</span>
+</div>
+
+<div class="eg-toolbar">
+    <div class="eg-toolbar__left">
+        <button class="@ClasseBtnVista(VistaCalendario.Settimanale)"
+                @onclick="() => ImpostaVista(VistaCalendario.Settimanale)">
+            Settimana
+        </button>
+        <button class="@ClasseBtnVista(VistaCalendario.Giornaliera)"
+                @onclick="() => ImpostaVista(VistaCalendario.Giornaliera)">
+            Giorno
+        </button>
+    </div>
+
+    <div class="eg-toolbar__actions">
+        <button class="eg-btn-ghost" @onclick="NavigaIndietro">&#8249;</button>
+        <button class="eg-btn-ghost" @onclick="VaiAOggi">Oggi</button>
+        <button class="eg-btn-ghost" @onclick="NavigaAvanti">&#8250;</button>
+
+        @* Bottoni collapse giorno — solo vista settimanale *@
+        @if (_vistaAttiva == VistaCalendario.Settimanale)
+        {
+            @foreach (var g in GiorniSettimana)
+            {
+                var giorno = g;
+                bool off = _giorniCollassati.Contains(giorno.Date);
+                <button class="eg-btn-ghost cal-btn-giorno @(off ? "cal-btn-giorno--off" : "")"
+                        title="@(off ? "Mostra" : "Nascondi") @giorno.ToString("dddd")"
+                        @onclick="() => ToggleGiorno(giorno)">
+                    @giorno.ToString("ddd dd")
+                </button>
+            }
+        }
+    </div>
+</div>
+
+@if (_caricamento)
+{
+    <p class="eg-hint" style="text-align:center;padding:3rem;">Caricamento...</p>
+}
+else
+{
+    <div class="cal-outer">
+        <div class="cal-grid" style="@StileGriglia">
+
+            @* ── Angolo fisso (top-left) ──────────────────────────── *@
+            <div class="cal-corner"></div>
+
+            @* ── Intestazioni colonne ─────────────────────────────── *@
+            @foreach (var col in ColonneVisibili)
+            {
+                <div class="cal-col-header">
+                    @if (_vistaAttiva == VistaCalendario.Settimanale)
+                    {
+                        <span class="cal-col-header__giorno
+                            @(col.Giorno.Date == DateTime.Today.Date ? "cal-col-header__giorno--oggi" : "")">
+                            @col.Giorno.ToString("ddd dd/MM")
+                        </span>
+                    }
+                    <span class="cal-col-header__codice">@col.Aula.Codice</span>
+                    <span class="cal-col-header__desc">@col.Aula.Descrizione</span>
+                </div>
+            }
+
+            @* ── Colonna orari ────────────────────────────────────── *@
+            <div class="cal-time-col" style="height:@(AltezzaTotale)px;">
+                @for (int h = OraInizio; h <= OraFine; h++)
+                {
+                    int ora = h;
+                    <div class="cal-time-label" style="top:@(SlotTop(ora, 0))px;">
+                        @($"{ora:D2}:00")
+                    </div>
+                }
+            </div>
+
+            @* ── Colonne lezioni ──────────────────────────────────── *@
+            @foreach (var col in ColonneVisibili)
+            {
+                var colonna = col;
+                <div class="cal-col"
+                     style="height:@(AltezzaTotale)px;"
+                     @ondragover:preventDefault
+                     @ondrop="(e) => HandleDrop(e, colonna)"
+                     @onclick="(e) => HandleClickCella(e, colonna)">
+
+                    @* Linee slot 15 min — sfondo della griglia *@
+                    @for (int s = 0; s < TotaleSlot; s++)
+                    {
+                        int slot = s;
+                        <div class="cal-slot @(slot % 4 == 0 ? "cal-slot--ora" : "")"
+                             style="top:@(slot * SlotHeight)px;"></div>
+                    }
+
+                    @* Blocchi lezione *@
+                    @foreach (var lz in GetLezioniPerColonna(colonna))
+                    {
+                        var lezione = lz;
+                        <BloccoOra Lezione="lezione"
+                                   ColoreHex="@GetColoreHex(lezione.Lingua)"
+                                   NomiStudenti="@GetNomiStudenti(lezione)"
+                                   NomiProfessori="@GetNomiProfessori(lezione)"
+                                   OnDoppioClick="HandleDoppioClickLezione"
+                                   OnDragStart="HandleDragStart"
+                                   Stile="@StileLezione(lezione)" />
+                    }
+                </div>
+            }
+
+        </div>
+    </div>
+}
+
+@if (_mostraPicker)
+{
+    <div class="cal-overlay" @onclick="ChiudiPicker">
+        <div class="cal-picker" @onclick:stopPropagation="true">
+            <p class="eg-card-title" style="margin-bottom:12px;">
+                Più lezioni in questo slot — quale vuoi modificare?
+            </p>
+            @foreach (var lz in _lezioniSovrapposte)
+            {
+                var l = lz;
+                <button class="eg-btn" @onclick="() => SelezionaLezioneSovrapposta(l)">
+                    <strong>@lz.DataOraInizio?.ToString("HH:mm")–@lz.DataOraFine?.ToString("HH:mm")</strong>
+                    &nbsp;@lz.Lingua
+                    <span style="color:var(--eg-text-muted);font-size:11px;">&nbsp;@lz.Stato</span>
+                </button>
+            }
+            <button class="eg-btn-ghost" style="width:100%;margin-top:8px;" @onclick="ChiudiPicker">
+                Annulla
+            </button>
+        </div>
+    </div>
+}
+
+@* ══════════════════════════════════════════════════════════════════════════
+   MODALE LEZIONE
+   ══════════════════════════════════════════════════════════════════════════ *@
+@if (_statoModale != StatoModale.Chiuso)
+{
+    <div class="cal-overlay" @onclick="ChiudiModale">
+        <div class="cal-modale" @onclick:stopPropagation="true">
+
+            @* ── Intestazione ────────────────────────────────────────── *@
+            <div class="cal-modale__header">
+                <span class="eg-card-title" style="margin:0;">
+                    @(_statoModale == StatoModale.NuovaLezione
+                        ? "Nuova lezione"
+                        : $"Lezione {_lezioneOriginale?.Anno}/{_lezioneOriginale?.Numero}")
+                </span>
+                <button class="eg-btn-ghost" style="padding:4px 10px;" @onclick="ChiudiModale">✕</button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_erroreModale))
+            {
+                <div class="eg-alert eg-alert-err" style="margin-bottom:16px;">@_erroreModale</div>
+            }
+
+            @* ── SEZIONE 1: Dati lezione ─────────────────────────────── *@
+            <div class="cal-modale__section-title">Dati lezione</div>
+            <div class="eg-form-layout">
+                <div class="eg-field">
+                    <label class="eg-label">Inizio</label>
+                    <input type="datetime-local" class="eg-input"
+                           value="@DataOraInizioModale"
+                           @onchange="e => SetDataOraInizio(e.Value?.ToString())" />
+                </div>
+                <div class="eg-field">
+                    <label class="eg-label">Fine</label>
+                    <input type="datetime-local" class="eg-input"
+                           value="@DataOraFineModale"
+                           @onchange="e => SetDataOraFine(e.Value?.ToString())" />
+                </div>
+                <div class="eg-field">
+                    <label class="eg-label">Lingua</label>
+                    <select class="eg-input" @bind="_lezioneModale.Lingua">
+                        <option value="">— seleziona —</option>
+                        @foreach (var l in _lingue)
+                        {
+                            <option value="@l.Codice">@l.Descrizione (@l.Codice)</option>
+                        }
+                    </select>
+                </div>
+                <div class="eg-field">
+                    <label class="eg-label">Aula</label>
+                    <select class="eg-input" @bind="_lezioneModale.Aula">
+                        <option value="">— seleziona —</option>
+                        @foreach (var a in _aule)
+                        {
+                            <option value="@a.Codice">@a.Descrizione (@a.Codice)</option>
+                        }
+                    </select>
+                </div>
+                <div class="eg-field">
+                    <label class="eg-label">Stato</label>
+                    <select class="eg-input" @bind="_lezioneModale.Stato">
+                        <option value="PREVISIONALE">Previsionale</option>
+                        <option value="PROVVISORIA">Provvisoria</option>
+                        <option value="CONFERMATA">Confermata</option>
+                        <option value="IN CORSO">In corso</option>
+                        <option value="CONCLUSA">Conclusa</option>
+                        <option value="CANCELLATA">Cancellata</option>
+                    </select>
+                </div>
+                <div class="eg-field" style="align-self:end;flex-direction:row;
+                    align-items:center;gap:8px;">
+                    <input type="checkbox" class="eg-checkbox" id="chkCsa"
+                           @bind="_lezioneModale.CambioStatoAutomatico" />
+                    <label class="eg-label" for="chkCsa"
+                           style="text-transform:none;letter-spacing:0;font-size:12px;cursor:pointer;">
+                        Aggiornamento automatico stato
+                    </label>
+                </div>
+                <div class="eg-field eg-card-full">
+                    <label class="eg-label">Note</label>
+                    <textarea class="eg-input" rows="2" @bind="_lezioneModale.NoteLezione"></textarea>
+                </div>
+            </div>
+
+            @* ── SEZIONE 2: Professori ───────────────────────────────── *@
+            <div class="cal-modale__section-title">Professori</div>
+
+            @foreach (var imp in _impartizioniModale)
+            {
+                var i = imp;
+                string nomeProf = _nomiProfessori.TryGetValue(i.IdProfessore, out var np) ? np : $"#{i.IdProfessore}";
+                <div class="cal-modale__item">
+                    <span class="cal-modale__item-nome">@nomeProf</span>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <label class="eg-label" style="text-transform:none;">Paga €</label>
+                        <input type="number" class="eg-input" style="width:80px;"
+                               value="@i.PagaTotale"
+                               @onchange="e => AggiornaPagaImpartizione(i, e.Value?.ToString())" />
+                    </div>
+                    <button class="eg-btn-danger" style="padding:4px 10px;font-size:11px;"
+                            @onclick="() => RimuoviImpartizioneDaModale(i)">
+                        Rimuovi
+                    </button>
+                </div>
+            }
+
+            <div class="cal-modale__aggiungi">
+                <select class="eg-input" style="flex:1;" @bind="_idProfessoreSelezionato">
+                    <option value="0">— aggiungi professore —</option>
+                    @foreach (var p in ProfessoriDisponibili)
+                    {
+                        <option value="@p.ID">@p.Cognome @p.Nome</option>
+                    }
+                </select>
+                <button class="eg-btn-primary"
+                        disabled="@(_idProfessoreSelezionato <= 0)"
+                        @onclick="AggiungiImpartizioneDaModale">
+                    Aggiungi
+                </button>
+            </div>
+
+            @* ── SEZIONE 3: Studenti ─────────────────────────────────── *@
+            <div class="cal-modale__section-title">Studenti</div>
+
+            @foreach (var part in _partecipazioniModale)
+            {
+                var p = part;
+                string nomeSt = _nomiClienti.TryGetValue(p.IdCliente, out var nc) ? nc : $"#{p.IdCliente}";
+                <div class="cal-modale__studente">
+                    <div class="cal-modale__item">
+                        <span class="cal-modale__item-nome">@nomeSt</span>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <label class="eg-label" style="text-transform:none;">Costo €</label>
+                            <input type="number" class="eg-input" style="width:80px;"
+                                   value="@p.CostoLezione"
+                                   @onchange="e => AggiornaCostoPartecipazione(p, e.Value?.ToString())" />
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <input type="checkbox" class="eg-checkbox"
+                                   checked="@p.PartecipazioneAvvenuta"
+                                   @onchange="e => AggiornaPresenzaPartecipazione(p, (bool)(e.Value ?? false))" />
+                            <span style="font-size:11px;color:var(--eg-text-muted);">Presente</span>
+                        </div>
+                        <button class="eg-btn-danger" style="padding:4px 10px;font-size:11px;"
+                                @onclick="() => RimuoviPartecipazioneDaModale(p)">
+                            Rimuovi
+                        </button>
+                    </div>
+
+                    @* Pacchetti dello studente *@
+                    @if (_pacchettiPerStudente.TryGetValue(p.IdCliente, out var pks) && pks.Any())
+                    {
+                        <div class="cal-modale__pacchetti">
+                            @foreach (var pk in pks)
+                            {
+                                <div class="cal-modale__pacchetto">
+                                    <span>Pacch. @pk.DataOraSottoscrizione?.ToString("dd/MM/yy")</span>
+                                    <span class="cal-modale__pacchetto-min">
+                                        @pk.MinutiRimasti min
+                                        (@($"{pk.MinutiRimasti / 60}h {pk.MinutiRimasti % 60:D2}m"))
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else if (_pacchettiPerStudente.ContainsKey(p.IdCliente))
+                    {
+                        <p class="eg-hint" style="margin:4px 0 4px 0;">Nessun pacchetto valido</p>
+                    }
+                </div>
+            }
+
+            <div class="cal-modale__aggiungi">
+                <select class="eg-input" style="flex:1;"
+                        @bind="_idClienteSelezionato"
+                        @bind:after="OnClienteSelezionatoChanged">
+                    <option value="0">— aggiungi studente —</option>
+                    @foreach (var c in StudentiDisponibili)
+                    {
+                        <option value="@c.ID">@c.Cognome @c.Nome</option>
+                    }
+                </select>
+                <button class="eg-btn-primary"
+                        disabled="@(_idClienteSelezionato <= 0)"
+                        @onclick="AggiungiPartecipazioneDaModale">
+                    Aggiungi
+                </button>
+            </div>
+
+            @* ── Footer azioni ───────────────────────────────────────── *@
+            <div class="cal-modale__footer">
+                @if (_statoModale == StatoModale.ModificaLezione)
+                {
+                    <button class="eg-btn-danger" @onclick="EliminaLezione"
+                            disabled="@_operazioneInCorso">
+                        Elimina
+                    </button>
+                }
+                <button class="eg-btn-ghost" @onclick="ChiudiModale"
+                        disabled="@_operazioneInCorso">
+                    Annulla
+                </button>
+                <button class="eg-btn-primary" @onclick="SalvaLezione"
+                        disabled="@_operazioneInCorso">
+                    @(_operazioneInCorso ? "Salvataggio…" : "Salva")
+                </button>
+            </div>
+
+        </div>
+    </div>
+}

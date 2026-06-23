@@ -1,0 +1,257 @@
+@page "/anagrafiche/clienti/nuovo"
+@using EufoGestShared.DTO
+@rendermode InteractiveWebAssembly
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<PageTitle>Nuovo Cliente — EufoGest</PageTitle>
+
+<div class="eg-header">
+    <h1>EufoGest</h1>
+    <span class="eg-subtitle">Nuovo Cliente</span>
+</div>
+
+@if (salvataggioOk)
+{
+    <div class="eg-alert eg-alert-ok">
+        Cliente salvato con successo.
+        <a href="/anagrafiche/clienti" class="eg-alert-link">Torna alla lista</a>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errore))
+{
+    <div class="eg-alert eg-alert-err">@errore</div>
+}
+
+<div class="eg-form-layout">
+
+    <!-- DATI ANAGRAFICI -->
+    <div class="eg-card">
+        <h2 class="eg-card-title">Dati anagrafici</h2>
+
+        <div class="eg-field-row">
+            <div class="eg-field">
+                <label class="eg-label" for="txtNome">Nome</label>
+                <input class="eg-input" id="txtNome" type="text"
+                       placeholder="Nome..."
+                       @bind="form.Nome" @bind:event="oninput" />
+            </div>
+            <div class="eg-field">
+                <label class="eg-label" for="txtCognome">Cognome</label>
+                <input class="eg-input" id="txtCognome" type="text"
+                       placeholder="Cognome..."
+                       @bind="form.Cognome" @bind:event="oninput" />
+            </div>
+        </div>
+
+        <div class="eg-field-row">
+            <div class="eg-field">
+                <label class="eg-label" for="txtDataNascita">Data di nascita</label>
+                <input class="eg-input" id="txtDataNascita" type="date"
+                       @bind="form.DataNascita" @bind:event="oninput" />
+            </div>
+            <div class="eg-field">
+                <label class="eg-label" for="txtTelefono">Numero di telefono</label>
+                <input class="eg-input" id="txtTelefono" type="tel"
+                       placeholder="Telefono..."
+                       maxlength="15"
+                       @bind="form.NumeroTelefono" @bind:event="oninput" />
+            </div>
+        </div>
+
+        <div class="eg-field">
+            <label class="eg-label" for="txtEmail">Email</label>
+            <input class="eg-input" id="txtEmail" type="email"
+                   placeholder="Email... "
+                   @bind="form.Email" @bind:event="oninput" />
+        </div>
+    </div>
+
+    <!-- ISCRIZIONE -->
+    <div class="eg-card">
+        <h2 class="eg-card-title">Iscrizione</h2>
+
+        <div class="eg-field">
+            <label class="eg-label" for="txtDataIscrizione">Data di iscrizione</label>
+            <input class="eg-input" id="txtDataIscrizione" type="date"
+                   @bind="form.DataIscrizione" @bind:event="oninput" />
+        </div>
+
+        <div class="eg-field">
+            <label class="eg-label">
+                <input type="checkbox" id="chkAttiva" class="eg-checkbox" @bind="form.Attiva" />
+                Anagrafica attiva
+            </label>
+        </div>
+    </div>
+
+    <!-- LINGUE STUDIATE -->
+    <div class="eg-card eg-card-full">
+        <h2 class="eg-card-title">Lingue studiate</h2>
+
+        @if (linguePossibili == null)
+        {
+            <p class="eg-wip">Caricamento lingue...</p>
+        }
+        else
+        {
+            <div class="eg-lingue-grid">
+                @foreach (var lingua in linguePossibili)
+                {
+                    var selezionata = form.LingueSelezionate.Contains(lingua.Codice);
+                    <button type="button"
+                            class="eg-lingua-pill @(selezionata ? "eg-lingua-pill--on" : "")"
+                            @onclick="() => ToggleLingua(lingua.Codice)">
+                        @lingua.Descrizione
+                    </button>
+                }
+            </div>
+
+            @if (form.LingueSelezionate.Count == 0)
+            {
+                <p class="eg-hint">Seleziona almeno una lingua.</p>
+            }
+        }
+    </div>
+
+    <!-- AZIONI -->
+    <div class="eg-form-actions">
+        <a href="/anagrafiche/clienti" class="eg-btn eg-btn-ghost">Annulla</a>
+        <button class="eg-btn eg-btn-primary"
+                disabled="@(invio || !CanSaveCliente())"
+                @onclick="SalvaCliente">
+            @if (invio)
+            {
+                <span>Salvataggio...</span>
+            }
+            else
+            {
+                <span>Salva cliente</span>
+            }
+        </button>
+    </div>
+
+</div>
+
+@code {
+
+    // ── Modello form ─────────────────────────────────────────────────────────
+
+    private class NuovoClienteForm
+    {
+        public string Nome { get; set; } = "";
+        public string Cognome { get; set; } = "";
+        public DateTime? DataNascita { get; set; }
+        public string NumeroTelefono { get; set; } = "";
+        public string Email { get; set; } = "";
+        public DateTime? DataIscrizione { get; set; } = DateTime.Today;
+        public bool Attiva { get; set; } = true;
+        public HashSet<string> LingueSelezionate { get; set; } = new();
+    }
+
+    private class LinguaItem
+    {
+        public string Codice { get; set; } = "";
+        public string Descrizione { get; set; } = "";
+    }
+
+    // ── Stato ────────────────────────────────────────────────────────────────
+
+    private NuovoClienteForm form = new();
+    private List<LinguaItem>? linguePossibili;
+    private bool invio = false;
+    private bool salvataggioOk = false;
+    private string errore = "";
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            linguePossibili = await Http.GetFromJsonAsync<List<LinguaItem>>(
+                "api/Lingue/All") ?? new();
+        }
+        catch
+        {
+            // Fallback statico
+            linguePossibili = new List<LinguaItem>
+            {
+                new() { Codice = "ita", Descrizione = "Italiano" },
+                new() { Codice = "eng", Descrizione = "Inglese" },
+                new() { Codice = "fra", Descrizione = "Francese" },
+                new() { Codice = "ger", Descrizione = "Tedesco" },
+                new() { Codice = "spa", Descrizione = "Spagnolo" },
+                new() { Codice = "rus", Descrizione = "Russo" },
+                new() { Codice = "chi", Descrizione = "Cinese" },
+                new() { Codice = "jpn", Descrizione = "Giapponese" },
+                new() { Codice = "ara", Descrizione = "Arabo" },
+                new() { Codice = "kor", Descrizione = "Coreano" },
+                new() { Codice = "tai", Descrizione = "Thailandese" },
+            };
+        }
+    }
+
+    private bool CanSaveCliente()
+    {
+        if (form.Nome == "") return false;
+        if (form.Cognome == "") return false;
+        if (form.Email == "" || form.NumeroTelefono == "") return false;
+        if (form.LingueSelezionate.Count == 0) return false;
+
+        return true;
+    }
+
+    private void ToggleLingua(string codice)
+    {
+        if (!form.LingueSelezionate.Remove(codice))
+            form.LingueSelezionate.Add(codice);
+    }
+
+    private async Task SalvaCliente()
+    {
+        if (!CanSaveCliente()) return;
+
+        invio = true;
+        errore = "";
+        salvataggioOk = false;
+
+        try
+        {
+            ClienteDTO payload = new()
+            {
+                ID = 0,
+                Nome = form.Nome,
+                Cognome = form.Cognome,
+                DataNascita = form.DataNascita,
+                Telefono = form.NumeroTelefono,
+                Email = form.Email,
+                Data_Iscrizione = form.DataIscrizione,
+                Attiva = form.Attiva,
+                LingueStudiate = form.LingueSelezionate
+            };
+
+            var risposta = await Http.PostAsJsonAsync("api/Anagrafiche/Clienti/Nuovo", payload);
+
+            if (risposta.IsSuccessStatusCode)
+            {
+                salvataggioOk = true;
+                Nav.NavigateTo("/");
+            }
+            else
+            {
+                errore = $"Errore dal server: {(int)risposta.StatusCode} {risposta.ReasonPhrase}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errore = $"Errore di rete: {ex.Message}";
+        }
+        finally
+        {
+            invio = false;
+        }
+
+    }
+}

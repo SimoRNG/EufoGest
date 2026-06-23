@@ -1,0 +1,828 @@
+﻿/* ── Variabili tema ─────────────────────────────────────────────────────── */
+:root {
+    --eg-primary: #27500A;
+    --eg-primary-mid: #3B6D11;
+    --eg-primary-light: #97C459;
+    --eg-primary-pale: #C0DD97;
+    --eg-primary-wash: #EAF3DE;
+    --eg-danger: #8b0000;
+    --eg-danger-pale: #fff0f0;
+    --eg-danger-border: #f5a0a0;
+    --eg-border-radius-card: 14px;
+    --eg-border-radius-btn: 8px;
+    --eg-border-radius-pill: 20px;
+    --eg-text-main: #1a1a1a;
+    --eg-text-muted: #aaa;
+    --eg-disabled-border: #e0e0e0;
+    --eg-disabled-text: #aaa;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+
+.eg-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 1.75rem;
+}
+
+    .eg-header h1 {
+        font-size: 22px;
+        font-weight: 500;
+        color: var(--eg-primary);
+        margin: 0;
+    }
+
+.eg-subtitle {
+    font-size: 12px;
+    color: var(--eg-primary-mid);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* ── Grid home ─────────────────────────────────────────────────────────── */
+
+.eg-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ── Card ──────────────────────────────────────────────────────────────── */
+
+.eg-card {
+    background: white;
+    border: 1px solid var(--eg-primary-light);
+    border-radius: var(--eg-border-radius-card);
+    padding: 1.25rem;
+}
+
+.eg-card-disabled {
+    border-color: var(--eg-disabled-border);
+}
+
+.eg-card-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--eg-primary-mid);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 1rem 0;
+}
+
+.eg-card-disabled .eg-card-title {
+    color: var(--eg-disabled-text);
+}
+
+/* ── Bottone standard (link) ───────────────────────────────────────────── */
+
+.eg-btn {
+    display: block;
+    background: var(--eg-primary-wash);
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--eg-primary);
+    text-decoration: none;
+    margin-bottom: 6px;
+}
+
+    .eg-btn:hover {
+        background: var(--eg-primary-pale);
+    }
+
+    .eg-btn:last-child {
+        margin-bottom: 0;
+    }
+
+/* ── WIP placeholder ───────────────────────────────────────────────────── */
+
+.eg-wip {
+    font-size: 12px;
+    color: var(--eg-text-muted);
+    text-align: center;
+    padding: 2rem 0;
+    margin: 0;
+}
+
+/* ── Layout form ───────────────────────────────────────────────────────── */
+
+.eg-form-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.eg-card-full {
+    grid-column: 1 / -1;
+}
+
+.eg-form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+/* ── Campi form ────────────────────────────────────────────────────────── */
+
+.eg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+    .eg-field:last-child {
+        margin-bottom: 0;
+    }
+
+.eg-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.eg-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--eg-primary-mid);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.eg-input {
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--eg-text-main);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+    .eg-input:focus {
+        border-color: var(--eg-primary-mid);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--eg-primary-mid) 10%, transparent);
+    }
+
+    .eg-input::placeholder {
+        color: var(--eg-text-muted);
+    }
+
+.eg-checkbox {
+    accent-color: var(--eg-primary-mid);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* ── Pill lingue ───────────────────────────────────────────────────────── */
+
+.eg-lingue-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.eg-lingua-pill {
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-pill);
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--eg-primary);
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    user-select: none;
+}
+
+    .eg-lingua-pill:hover {
+        background: var(--eg-primary-wash);
+    }
+
+.eg-lingua-pill--on {
+    background: var(--eg-primary-mid);
+    border-color: var(--eg-primary-mid);
+    color: #fff;
+}
+
+    .eg-lingua-pill--on:hover {
+        background: var(--eg-primary);
+        border-color: var(--eg-primary);
+    }
+
+/* ── Bottone primario (azione principale) ──────────────────────────────── */
+
+.eg-btn-primary {
+    background: var(--eg-primary-mid);
+    border: 1px solid var(--eg-primary-mid);
+    color: #fff;
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.12s;
+    text-decoration: none;
+}
+
+    .eg-btn-primary:hover:not(:disabled) {
+        background: var(--eg-primary);
+        border-color: var(--eg-primary);
+    }
+
+    .eg-btn-primary:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+/* ── Bottone ghost (azione secondaria) ─────────────────────────────────── */
+
+.eg-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 18px;
+    font-size: 13px;
+    color: var(--eg-primary-mid);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.12s;
+    display: inline-block;
+}
+
+    .eg-btn-ghost:hover {
+        background: var(--eg-primary-wash);
+    }
+
+/* ── Alert feedback ────────────────────────────────────────────────────── */
+
+.eg-alert {
+    border-radius: var(--eg-border-radius-btn);
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.eg-alert-ok {
+    background: var(--eg-primary-wash);
+    border: 1px solid var(--eg-primary-light);
+    color: var(--eg-primary);
+}
+
+.eg-alert-err {
+    background: var(--eg-danger-pale);
+    border: 1px solid var(--eg-danger-border);
+    color: var(--eg-danger);
+}
+
+.eg-alert-link {
+    color: var(--eg-primary-mid);
+    font-weight: 500;
+    text-decoration: underline;
+    margin-left: auto;
+}
+
+/* ── Hint ──────────────────────────────────────────────────────────────── */
+
+.eg-hint {
+    font-size: 11px;
+    color: var(--eg-text-muted);
+    margin: 0;
+}
+
+
+/* ── Toolbar ────────────────────────────────────────────────────────────── */
+
+.eg-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-card);
+    padding: 10px 16px;
+    margin-bottom: 1.25rem;
+    /* leggera ombra per staccarla dal contenuto sottostante */
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--eg-primary) 6%, transparent);
+}
+
+/* ── Slot sinistro (stato, breadcrumb, ecc.) ───────────────────────────── */
+
+.eg-toolbar__left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; /* non si restringe mai */
+}
+
+/* ── Slot destro (bottoni azione) ──────────────────────────────────────── */
+
+.eg-toolbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap; /* va a capo su schermi stretti */
+    justify-content: flex-end;
+}
+
+/* ── Bottone "danger" (Elimina) ────────────────────────────────────────── */
+
+.eg-btn-danger {
+    background: var(--eg-danger-pale);
+    border: 1px solid var(--eg-danger-border);
+    color: var(--eg-danger);
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    text-decoration: none;
+}
+
+    .eg-btn-danger:hover:not(:disabled) {
+        background: #fddada;
+        border-color: #e07070;
+    }
+
+    .eg-btn-danger:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+
+
+/* ── Stati Disabilitati per Input e Form ───────────────────────────────── */
+
+.eg-input:disabled,
+select.eg-input:disabled,
+textarea.eg-input:disabled {
+    background-color: #f9f9f9;
+    color: var(--eg-disabled-text);
+    border-color: var(--eg-disabled-border);
+    cursor: not-allowed;
+    box-shadow: none; /* Rimuove l'ombra del focus se forzato */
+}
+
+    .eg-input:disabled::placeholder,
+    textarea.eg-input:disabled::placeholder {
+        color: #d0d0d0;
+    }
+
+/* Ottimizzazioni per select e textarea standardizzate sulla classe .eg-input */
+select.eg-input {
+    appearance: auto; /* Ripristina la freccina nativa del browser */
+    cursor: pointer;
+}
+
+    select.eg-input:disabled {
+        cursor: not-allowed;
+    }
+
+textarea.eg-input {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit; /* Mantiene il font del tema anziché il monospace di default */
+}
+
+/* Aggiunta stato disabilitato per i bottoni Ghost */
+.eg-btn-ghost:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    color: var(--eg-disabled-text);
+    border-color: var(--eg-disabled-border);
+}
+
+    .eg-btn-ghost:disabled:hover {
+        background: transparent; /* Impedisce l'hover quando è disabilitato */
+    }
+
+
+
+
+/* ── Blocco lezione sul calendario ──────────────────────────────────────── */
+
+.blocco-ora {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    border-left: 3px solid; /* colore impostato inline dalla lingua     */
+    border-radius: 6px;
+    padding: 3px 6px;
+    cursor: grab;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+    user-select: none;
+    transition: box-shadow 0.15s, opacity 0.15s;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+    .blocco-ora:hover {
+        box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+        z-index: 10;
+    }
+
+    .blocco-ora:active {
+        cursor: grabbing;
+        opacity: 0.80;
+    }
+
+    /* Il blocco "fantasma" HTML5 durante il drag */
+    .blocco-ora[draggable="true"]:active {
+        opacity: 0.55;
+    }
+
+/* ── Riga superiore: orario + badge stato ───────────────────────────────── */
+
+.blocco-ora__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+}
+
+.blocco-ora__orario {
+    font-size: 10px;
+    font-weight: 700;
+    color: #222;
+    white-space: nowrap;
+}
+
+/* ── Badge stato ────────────────────────────────────────────────────────── */
+
+.blocco-ora__badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.blocco-ora__badge--previsionale {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.blocco-ora__badge--provvisoria {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.blocco-ora__badge--confermata {
+    background: #d4edda;
+    color: #155724;
+}
+
+.blocco-ora__badge--in-corso {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.blocco-ora__badge--conclusa {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.blocco-ora__badge--cancellata {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ── Lingua (materia) ───────────────────────────────────────────────────── */
+
+.blocco-ora__lingua {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1a1a1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 1px;
+}
+
+/* ── Righe professore / studente ────────────────────────────────────────── */
+
+.blocco-ora__riga {
+    font-size: 10px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+}
+
+.blocco-ora__etichetta {
+    color: #999;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ── Varianti visive per stato del blocco intero ────────────────────────── */
+
+.blocco-ora--cancellata {
+    opacity: 0.55;
+    text-decoration-line: line-through;
+    text-decoration-color: #aaa;
+}
+
+.blocco-ora--conclusa {
+    opacity: 0.75;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CALENDARIO LEZIONI — aggiungere a eufogest.css
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Bottoni collapse giorno (toolbar) ──────────────────────────────────── */
+
+.cal-btn-giorno {
+    font-size: 11px;
+    padding: 5px 10px;
+}
+
+.cal-btn-giorno--off {
+    opacity: 0.45;
+    text-decoration: line-through;
+}
+
+/* ── Contenitore esterno scorrevole ─────────────────────────────────────── */
+
+.cal-outer {
+    overflow: auto;
+    max-height: calc(100vh - 180px);
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-card);
+    background: #fff;
+}
+
+/* ── Griglia CSS principale ─────────────────────────────────────────────── */
+/* grid-template-columns è impostato inline dal code-behind in base
+   al numero di colonne visibili                                             */
+
+.cal-grid {
+    display: grid;
+    min-width: fit-content;
+}
+
+/* ── Angolo fisso top-left ──────────────────────────────────────────────── */
+
+.cal-corner {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    background: #fff;
+    border-bottom: 1px solid var(--eg-primary-pale);
+    border-right: 1px solid var(--eg-primary-pale);
+}
+
+/* ── Intestazioni colonne (sticky top) ──────────────────────────────────── */
+
+.cal-col-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--eg-primary-wash);
+    border-bottom: 2px solid var(--eg-primary-light);
+    border-right: 1px solid var(--eg-primary-pale);
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.cal-col-header__giorno {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--eg-primary-mid);
+    text-transform: capitalize;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.cal-col-header__giorno--oggi {
+    color: var(--eg-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.cal-col-header__codice {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--eg-text-main);
+}
+
+.cal-col-header__desc {
+    font-size: 10px;
+    color: var(--eg-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Colonna orari (sticky left) ────────────────────────────────────────── */
+
+.cal-time-col {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: #fff;
+    border-right: 1px solid var(--eg-primary-pale);
+}
+
+.cal-time-label {
+    position: absolute;
+    right: 6px;
+    font-size: 10px;
+    color: var(--eg-text-muted);
+    line-height: 1;
+    padding-top: 2px;
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* ── Colonne dati ───────────────────────────────────────────────────────── */
+
+.cal-col {
+    position: relative;
+    border-right: 1px solid var(--eg-primary-pale);
+    cursor: crosshair;
+}
+
+    .cal-col:last-child {
+        border-right: none;
+    }
+
+/* ── Linee slot ─────────────────────────────────────────────────────────── */
+
+.cal-slot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 20px; /* SlotHeight */
+    border-bottom: 1px dotted #f0f0f0;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+.cal-slot--ora {
+    border-bottom-color: var(--eg-primary-pale);
+    border-bottom-style: solid;
+}
+
+/* ── Overlay (picker e modale) ──────────────────────────────────────────── */
+
+.cal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+/* ── Picker sovrapposizioni ─────────────────────────────────────────────── */
+
+.cal-picker {
+    background: #fff;
+    border-radius: var(--eg-border-radius-card);
+    padding: 20px;
+    min-width: 280px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+/* ── Modale lezione ─────────────────────────────────────────────────────── */
+
+.cal-modale {
+    background: #fff;
+    border-radius: var(--eg-border-radius-card);
+    padding: 24px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.cal-modale__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.cal-modale__section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--eg-primary-mid);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-top: 1px solid var(--eg-primary-pale);
+    padding-top: 16px;
+    margin-top: 16px;
+    margin-bottom: 12px;
+}
+
+/* ── Riga professore / studente nella modale ────────────────────────────── */
+
+.cal-modale__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+    flex-wrap: wrap;
+}
+
+.cal-modale__item-nome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--eg-text-main);
+    flex: 1;
+    min-width: 120px;
+}
+
+/* ── Contenitore studente (include riga + pacchetti) ────────────────────── */
+
+.cal-modale__studente {
+    margin-bottom: 4px;
+}
+
+/* ── Pacchetti ore studente ─────────────────────────────────────────────── */
+
+.cal-modale__pacchetti {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 0 8px 0;
+}
+
+.cal-modale__pacchetto {
+    display: flex;
+    flex-direction: column;
+    background: var(--eg-primary-wash);
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    color: var(--eg-primary);
+    gap: 1px;
+}
+
+.cal-modale__pacchetto-min {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--eg-primary-mid);
+}
+
+/* ── Riga "aggiungi" (select + bottone) ─────────────────────────────────── */
+
+.cal-modale__aggiungi {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+/* ── Footer azioni modale ───────────────────────────────────────────────── */
+
+.cal-modale__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 20px;
+    margin-top: 8px;
+    border-top: 1px solid var(--eg-primary-pale);
+}
+
+    .cal-modale__footer .eg-btn-danger {
+        margin-right: auto; /* spinge il pulsante Elimina a sinistra */
+    }

@@ -1,0 +1,304 @@
+﻿/* ── Variabili tema ─────────────────────────────────────────────────────── */
+:root {
+    --eg-primary: #27500A;
+    --eg-primary-mid: #3B6D11;
+    --eg-primary-light: #97C459;
+    --eg-primary-pale: #C0DD97;
+    --eg-primary-wash: #EAF3DE;
+    --eg-danger: #8b0000;
+    --eg-danger-pale: #fff0f0;
+    --eg-danger-border: #f5a0a0;
+    --eg-border-radius-card: 14px;
+    --eg-border-radius-btn: 8px;
+    --eg-border-radius-pill: 20px;
+    --eg-text-main: #1a1a1a;
+    --eg-text-muted: #aaa;
+    --eg-disabled-border: #e0e0e0;
+    --eg-disabled-text: #aaa;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+
+.eg-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 1.75rem;
+}
+
+    .eg-header h1 {
+        font-size: 22px;
+        font-weight: 500;
+        color: var(--eg-primary);
+        margin: 0;
+    }
+
+.eg-subtitle {
+    font-size: 12px;
+    color: var(--eg-primary-mid);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* ── Grid home ─────────────────────────────────────────────────────────── */
+
+.eg-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ── Card ──────────────────────────────────────────────────────────────── */
+
+.eg-card {
+    background: white;
+    border: 1px solid var(--eg-primary-light);
+    border-radius: var(--eg-border-radius-card);
+    padding: 1.25rem;
+}
+
+.eg-card-disabled {
+    border-color: var(--eg-disabled-border);
+}
+
+.eg-card-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--eg-primary-mid);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 1rem 0;
+}
+
+.eg-card-disabled .eg-card-title {
+    color: var(--eg-disabled-text);
+}
+
+/* ── Bottone standard (link) ───────────────────────────────────────────── */
+
+.eg-btn {
+    display: block;
+    background: var(--eg-primary-wash);
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--eg-primary);
+    text-decoration: none;
+    margin-bottom: 6px;
+}
+
+    .eg-btn:hover {
+        background: var(--eg-primary-pale);
+    }
+
+    .eg-btn:last-child {
+        margin-bottom: 0;
+    }
+
+/* ── WIP placeholder ───────────────────────────────────────────────────── */
+
+.eg-wip {
+    font-size: 12px;
+    color: var(--eg-text-muted);
+    text-align: center;
+    padding: 2rem 0;
+    margin: 0;
+}
+
+/* ── Layout form ───────────────────────────────────────────────────────── */
+
+.eg-form-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.eg-card-full {
+    grid-column: 1 / -1;
+}
+
+.eg-form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+/* ── Campi form ────────────────────────────────────────────────────────── */
+
+.eg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+    .eg-field:last-child {
+        margin-bottom: 0;
+    }
+
+.eg-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.eg-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--eg-primary-mid);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.eg-input {
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--eg-text-main);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+    .eg-input:focus {
+        border-color: var(--eg-primary-mid);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--eg-primary-mid) 10%, transparent);
+    }
+
+    .eg-input::placeholder {
+        color: var(--eg-text-muted);
+    }
+
+.eg-checkbox {
+    accent-color: var(--eg-primary-mid);
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* ── Pill lingue ───────────────────────────────────────────────────────── */
+
+.eg-lingue-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.eg-lingua-pill {
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-pill);
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--eg-primary);
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    user-select: none;
+}
+
+    .eg-lingua-pill:hover {
+        background: var(--eg-primary-wash);
+    }
+
+.eg-lingua-pill--on {
+    background: var(--eg-primary-mid);
+    border-color: var(--eg-primary-mid);
+    color: #fff;
+}
+
+    .eg-lingua-pill--on:hover {
+        background: var(--eg-primary);
+        border-color: var(--eg-primary);
+    }
+
+/* ── Bottone primario (azione principale) ──────────────────────────────── */
+
+.eg-btn-primary {
+    background: var(--eg-primary-mid);
+    border: 1px solid var(--eg-primary-mid);
+    color: #fff;
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.12s;
+    text-decoration: none;
+}
+
+    .eg-btn-primary:hover:not(:disabled) {
+        background: var(--eg-primary);
+        border-color: var(--eg-primary);
+    }
+
+    .eg-btn-primary:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+/* ── Bottone ghost (azione secondaria) ─────────────────────────────────── */
+
+.eg-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--eg-primary-pale);
+    border-radius: var(--eg-border-radius-btn);
+    padding: 8px 18px;
+    font-size: 13px;
+    color: var(--eg-primary-mid);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.12s;
+    display: inline-block;
+}
+
+    .eg-btn-ghost:hover {
+        background: var(--eg-primary-wash);
+    }
+
+/* ── Alert feedback ────────────────────────────────────────────────────── */
+
+.eg-alert {
+    border-radius: var(--eg-border-radius-btn);
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.eg-alert-ok {
+    background: var(--eg-primary-wash);
+    border: 1px solid var(--eg-primary-light);
+    color: var(--eg-primary);
+}
+
+.eg-alert-err {
+    background: var(--eg-danger-pale);
+    border: 1px solid var(--eg-danger-border);
+    color: var(--eg-danger);
+}
+
+.eg-alert-link {
+    color: var(--eg-primary-mid);
+    font-weight: 500;
+    text-decoration: underline;
+    margin-left: auto;
+}
+
+/* ── Hint ──────────────────────────────────────────────────────────────── */
+
+.eg-hint {
+    font-size: 11px;
+    color: var(--eg-text-muted);
+    margin: 0;
+}

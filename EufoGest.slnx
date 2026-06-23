@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="EufoGestREST/EufoGestREST.csproj" />
+  <Project Path="EufoGestShared/EufoGestShared.csproj" />
+  <Project Path="EufoGestWebApp/EufoGestWebApp.csproj" Id="d74f1a57-4aa5-4a73-b88a-92c9f640b682" />
+</Solution>

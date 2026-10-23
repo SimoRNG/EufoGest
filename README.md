@@ -1,4 +1,4 @@
-Progetto personale di studio per un gestionale per una scuola di lingue. Il focus di studio era il backend, front-end delegato in modo sostanziale all'AI
+Progetto personale di studio per un gestionale per una scuola di lingue. Il focus di studio era il back end, front end delegato in modo sostanziale all'AI
 
 # Obiettivi
 - Servizi REST e MySQL: Scrittura di servizi REST e query MySQL

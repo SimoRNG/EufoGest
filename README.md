@@ -13,4 +13,4 @@ Nello schema non sono presenti le tabelle che riguardano la parte di sicurezza
 - Inserimento e gestione delle lezioni
 
 # Configurazione
-- Necessario .env preciso (parametri di connessione e chiavi JWT)
+- Necessari .env preciso (parametri di connessione e chiavi JWT) e database MySQL

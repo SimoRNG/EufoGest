@@ -13,4 +13,54 @@ Nello schema non sono presenti le tabelle che riguardano la parte di sicurezza
 - Inserimento e gestione delle lezioni
 
 # Configurazione
-- Necessari .env preciso (parametri di connessione e chiavi JWT) e database MySQL
+- I progetti di avvio sono EufoGestREST e EufoGestWebApp
+- Necessari .env preciso (parametri di connessione e chiavi JWT) e database MariaDB MySQL
+- Nel progetto EufoGestREST bisogna avere un file secrets.json del tipo:
+```json
+  {
+  "ConnectionStrings": {
+    "ServerDati": "localhost",
+    "PortDati": "3306",
+    "DbNameDati": "nomeDb",
+    "DbUserDati": "utenteDb",
+    "PasswordDati": "passDb"
+
+  },
+
+  "Jwt": {
+    "Key": "chiaveLungaAlmeno32caratteriMoltoSicura",
+    "Issuer": "EufoGestREST",
+    "Audience": "EufoGestClients",
+    "ExpiresInMinutes": 10
+  }
+
+  }
+```
+
+appsettings.Development.json:
+```json
+{
+  "AllowedOrigins": [ "https://localhost:7266" ]
+}
+```
+
+La cartella properties deve contenere il file launchSettings.json del tipo:
+
+  ```json
+  {
+    "$schema": "https://json.schemastore.org/launchsettings.json",
+    "profiles": {
+      
+      "https": {
+        "commandName": "Project",
+        "dotnetRunMessages": true,
+        "launchBrowser": false,
+        "applicationUrl": "https://localhost:7004",
+        "environmentVariables": {
+          "ASPNETCORE_ENVIRONMENT": "Development"
+        }
+      }
+    }
+  }
+  ```
+

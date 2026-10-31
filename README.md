@@ -6,7 +6,7 @@ Progetto personale di studio per un gestionale per una scuola di lingue. Il focu
 
 # Schema Db
 <img width="1916" height="871" alt="EufoGest" src="https://github.com/user-attachments/assets/fef3223b-6e62-4f34-8f85-38351053d564" />
-Nello schema non sono presenti le tabelle che riguardano la parte di sicurezza
+Nello schema non sono presenti le tabelle che riguardano la parte di sicurezza. Il file di inizializzazione del database e db_main.sql presente nella soluzione
 
 # Stato attuale
 - Gestione anagrafiche clienti e professori
@@ -64,3 +64,4 @@ La cartella properties deve contenere il file launchSettings.json del tipo:
   }
   ```
 
+E' possibile effettuare l'accesso nella pagina di Login tramite le combinazioni user/pass : ADMIN/123 oppure USER/123 (nessuna funzionalità attiva)
